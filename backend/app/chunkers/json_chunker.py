@@ -3,18 +3,24 @@ from langchain_text_splitters import RecursiveJsonSplitter
 
 
 def json_chunk(text: str, max_chunk_size: int):
-    data = json.loads(text)
+    try:
+        data = json.loads(text)
+    except json.JSONDecodeError as e:
+        raise ValueError(
+            f"Invalid JSON input. Recursive JSON chunking only works with valid JSON. Error: {e.msg}"
+        )
 
-    splitter = RecursiveJsonSplitter(
-        max_chunk_size=max_chunk_size
-    )
+    splitter = RecursiveJsonSplitter(max_chunk_size=max_chunk_size)
 
-    docs = splitter.create_documents(texts=[data])
+    json_chunks = splitter.split_json(json_data=data)
 
     return [
         {
-            "text": doc.page_content,
-            "metadata": doc.metadata
+            "text": json.dumps(chunk, indent=2),
+            "metadata": {
+                "type": "json",
+                "chunking": "recursive_json"
+            }
         }
-        for doc in docs
+        for chunk in json_chunks
     ]
