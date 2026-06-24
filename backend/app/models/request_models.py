@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 from typing import Optional
 from typing import List
 
@@ -7,6 +7,21 @@ class ChunkRequest(BaseModel):
     strategy: str = "recursive"
     chunk_size: int = 800
     chunk_overlap: int = 120
+
+    @field_validator("chunk_size")
+    @classmethod
+    def validate_chunk_size(cls, value):
+        if value <= 0:
+            raise ValueError("chunk_size must be greater than 0")
+        return value
+
+    @field_validator("chunk_overlap")
+    @classmethod
+    def validate_chunk_overlap(cls, value):
+        if value < 0:
+            raise ValueError("chunk_overlap cannot be negative")
+        return value
+
 
 
 class UploadChunkRequest(BaseModel):

@@ -93,7 +93,12 @@ async function compareStrategies() {
     const data = await res.json();
 
     if (!res.ok) {
-      throw new Error(data.detail || "Comparison failed");
+      const message =
+        data?.detail?.message ||
+        data?.detail ||
+        "Something went wrong";
+
+      throw new Error(message);
     }
 
     setCompareResult(data);
@@ -137,7 +142,10 @@ async function compareStrategies() {
             <option value="python_code">Python Code</option>
             <option value="javascript_code">JavaScript Code</option>
           </select>
-
+          <p className="text-xs text-gray-400 mb-4">
+            Tip: Use recursive for normal text/PDF/DOCX, json_recursive for JSON,
+            markdown_header for Markdown, html_header for HTML, and code chunking for source files.
+          </p>
           <label className="block mb-2 text-sm text-gray-300">Chunk Size</label>
           <input
             type="number"

@@ -21,5 +21,11 @@ def chunk_document(request: ChunkRequest):
             chunk_size=request.chunk_size,
             chunk_overlap=request.chunk_overlap
         )
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(
+            status_code=400,
+            detail={
+                "error": type(e).__name__,
+                "message": str(e)
+            }
+        )

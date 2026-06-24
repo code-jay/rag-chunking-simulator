@@ -15,6 +15,7 @@ from app.chunkers.code_chunker import python_code_chunk, javascript_code_chunk
 
 from app.services.stats_service import build_chunk_objects, calculate_stats
 
+from app.services.validation_service import validate_chunk_request
 
 SUPPORTED_STRATEGIES = [
     {"id": "fixed_character", "name": "Fixed Character Chunking", "category": "basic"},
@@ -37,6 +38,8 @@ def get_supported_strategies():
 
 
 def chunk_text(text: str, strategy: str, chunk_size: int, chunk_overlap: int):
+    validate_chunk_request(text, strategy, chunk_size, chunk_overlap)
+    
     if strategy == "fixed_character":
         raw_chunks = fixed_character_chunk(text, chunk_size, chunk_overlap)
 
