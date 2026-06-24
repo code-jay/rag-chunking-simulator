@@ -15,3 +15,5 @@ out/
 # Project
 backend/uploads/
 backend/output/
+
+backend/models/
