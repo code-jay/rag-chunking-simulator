@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from app.api import chunking
 
 app = FastAPI(
     title="RAG Chunking Strategy Simulator",
@@ -14,12 +15,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(chunking.router, tags=["Chunking"])
+
+
 @app.get("/")
 def home():
     return {
         "application": "RAG Chunking Strategy Simulator",
         "status": "running"
     }
+
 
 @app.get("/health")
 def health():
