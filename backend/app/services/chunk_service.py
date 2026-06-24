@@ -16,6 +16,7 @@ from app.chunkers.code_chunker import python_code_chunk, javascript_code_chunk
 from app.services.stats_service import build_chunk_objects, calculate_stats
 
 from app.services.validation_service import validate_chunk_request
+from app.chunkers.semantic_chunker import semantic_similarity_chunk
 
 SUPPORTED_STRATEGIES = [
     {"id": "fixed_character", "name": "Fixed Character Chunking", "category": "basic"},
@@ -30,6 +31,7 @@ SUPPORTED_STRATEGIES = [
     {"id": "json_recursive", "name": "LangChain Recursive JSON Chunking", "category": "langchain"},
     {"id": "python_code", "name": "Python Code Chunking", "category": "code"},
     {"id": "javascript_code", "name": "JavaScript Code Chunking", "category": "code"},
+    {"id": "semantic_similarity", "name": "Semantic Similarity Chunking", "category": "semantic"}
 ]
 
 
@@ -37,9 +39,9 @@ def get_supported_strategies():
     return SUPPORTED_STRATEGIES
 
 
-def chunk_text(text: str, strategy: str, chunk_size: int, chunk_overlap: int):
+def chunk_text(text: str, strategy: str, chunk_size: int, chunk_overlap: int, similarity_threshold: float = 0.70):
     validate_chunk_request(text, strategy, chunk_size, chunk_overlap)
-    
+
     if strategy == "fixed_character":
         raw_chunks = fixed_character_chunk(text, chunk_size, chunk_overlap)
 
@@ -76,6 +78,12 @@ def chunk_text(text: str, strategy: str, chunk_size: int, chunk_overlap: int):
     elif strategy == "javascript_code":
         raw_chunks = javascript_code_chunk(text, chunk_size, chunk_overlap)
 
+    elif strategy == "semantic_similarity":
+        raw_chunks = semantic_similarity_chunk(text=text, similarity_threshold=0.70)
+    
+    elif strategy == "semantic_similarity":
+        raw_chunks = semantic_similarity_chunk( text=text, similarity_threshold=similarity_threshold)
+    
     else:
         raise ValueError(f"Unsupported chunking strategy: {strategy}")
 
@@ -86,7 +94,8 @@ def chunk_text(text: str, strategy: str, chunk_size: int, chunk_overlap: int):
         "strategy": strategy,
         "settings": {
             "chunk_size": chunk_size,
-            "chunk_overlap": chunk_overlap
+            "chunk_overlap": chunk_overlap,
+            "similarity_threshold": similarity_threshold
         },
         "stats": stats,
         "chunks": chunk_objects

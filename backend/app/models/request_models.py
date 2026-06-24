@@ -7,6 +7,7 @@ class ChunkRequest(BaseModel):
     strategy: str = "recursive"
     chunk_size: int = 800
     chunk_overlap: int = 120
+    similarity_threshold: float = 0.70
 
     @field_validator("chunk_size")
     @classmethod

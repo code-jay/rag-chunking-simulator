@@ -20,6 +20,7 @@ export type ChunkResponse = {
   settings: {
     chunk_size: number;
     chunk_overlap: number;
+    similarity_threshold?: number;
   };
   stats: ChunkStats;
   chunks: ChunkItem[];
@@ -40,4 +41,15 @@ export type CompareResponse = {
   chunk_size: number;
   chunk_overlap: number;
   results: CompareResultItem[];
+};
+
+export type RecursiveSemanticCompareResponse = {
+  recursive: ChunkResponse;
+  semantic: ChunkResponse;
+};
+
+export type StrategyRecommendation = {
+  recommended_strategy: string;
+  confidence: string;
+  reason: string;
 };

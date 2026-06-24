@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ChunkResponse, CompareResponse } from "@/types/chunking";
+import { ChunkResponse, CompareResponse, RecursiveSemanticCompareResponse,StrategyRecommendation } from "@/types/chunking";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -15,6 +15,11 @@ export default function Home() {
   const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState("");
   const [compareResult, setCompareResult] = useState<CompareResponse | null>(null);
+  const [similarityThreshold, setSimilarityThreshold] = useState(0.7);
+  const [recursiveSemanticResult, setRecursiveSemanticResult] =
+  useState<RecursiveSemanticCompareResponse | null>(null);
+  const [recommendation, setRecommendation] =
+  useState<StrategyRecommendation | null>(null);
 
   async function runChunking() {
   setLoading(true);
@@ -46,6 +51,7 @@ export default function Home() {
           strategy,
           chunk_size: chunkSize,
           chunk_overlap: chunkOverlap,
+          similarity_threshold: similarityThreshold,
         }),
       });
     }
@@ -109,6 +115,213 @@ async function compareStrategies() {
   }
 }
 
+async function compareRecursiveSemantic() {
+  setLoading(true);
+  setRecursiveSemanticResult(null);
+  setError("");
+
+  try {
+    const res = await fetch(`${API_URL}/compare-recursive-semantic`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        text,
+        chunk_size: chunkSize,
+        chunk_overlap: chunkOverlap,
+      }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data?.detail || "Recursive vs Semantic comparison failed");
+    }
+
+    setRecursiveSemanticResult(data);
+  } catch (err) {
+    setError(err instanceof Error ? err.message : "Unknown error");
+  } finally {
+    setLoading(false);
+  }
+}
+
+function exportJson() {
+  if (!result) return;
+
+  const exportData = {
+    exported_at: new Date().toISOString(),
+    strategy: result.strategy,
+    settings: result.settings,
+    stats: result.stats,
+    chunks: result.chunks,
+  };
+
+  const blob = new Blob([JSON.stringify(exportData, null, 2)], {
+    type: "application/json",
+  });
+
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+
+  link.href = url;
+  link.download = `chunks-${result.strategy}.json`;
+  link.click();
+
+  URL.revokeObjectURL(url);
+}
+
+async function copyChunks() {
+  if (!result) return;
+
+  const textToCopy = result.chunks
+    .map((chunk) => `Chunk ${chunk.chunk_id}\n${chunk.text}`)
+    .join("\n\n---\n\n");
+
+  await navigator.clipboard.writeText(textToCopy);
+  alert("Chunks copied to clipboard");
+}
+
+function generateLangChainCode() {
+  if (strategy === "recursive") {
+    return `from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+splitter = RecursiveCharacterTextSplitter(
+    chunk_size=${chunkSize},
+    chunk_overlap=${chunkOverlap},
+    separators=["\\\\n\\\\n", "\\\\n", ".", " ", ""]
+)
+
+chunks = splitter.split_text(text)`;
+  }
+
+  if (strategy === "markdown_header") {
+    return `from langchain_text_splitters import MarkdownHeaderTextSplitter
+
+headers_to_split_on = [
+    ("#", "h1"),
+    ("##", "h2"),
+    ("###", "h3"),
+]
+
+splitter = MarkdownHeaderTextSplitter(
+    headers_to_split_on=headers_to_split_on,
+    strip_headers=False
+)
+
+chunks = splitter.split_text(markdown_text)`;
+  }
+
+  if (strategy === "html_header") {
+    return `from langchain_text_splitters import HTMLHeaderTextSplitter
+
+headers_to_split_on = [
+    ("h1", "h1"),
+    ("h2", "h2"),
+    ("h3", "h3"),
+]
+
+splitter = HTMLHeaderTextSplitter(
+    headers_to_split_on=headers_to_split_on
+)
+
+chunks = splitter.split_text(html_text)`;
+  }
+
+  if (strategy === "python_code") {
+    return `from langchain_text_splitters import RecursiveCharacterTextSplitter, Language
+
+splitter = RecursiveCharacterTextSplitter.from_language(
+    language=Language.PYTHON,
+    chunk_size=${chunkSize},
+    chunk_overlap=${chunkOverlap}
+)
+
+chunks = splitter.split_text(code_text)`;
+  }
+
+  if (strategy === "javascript_code") {
+    return `from langchain_text_splitters import RecursiveCharacterTextSplitter, Language
+
+splitter = RecursiveCharacterTextSplitter.from_language(
+    language=Language.JS,
+    chunk_size=${chunkSize},
+    chunk_overlap=${chunkOverlap}
+)
+
+chunks = splitter.split_text(code_text)`;
+  }
+
+  if (strategy === "json_recursive") {
+    return `import json
+from langchain_text_splitters import RecursiveJsonSplitter
+
+data = json.loads(json_text)
+
+splitter = RecursiveJsonSplitter(
+    max_chunk_size=${chunkSize}
+)
+
+chunks = splitter.split_json(json_data=data)`;
+  }
+
+  if (strategy === "semantic_similarity") {
+    return `from sentence_transformers import SentenceTransformer
+from sklearn.metrics.pairwise import cosine_similarity
+
+model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
+
+# Split text into sentences
+# Generate embeddings
+# Compare sentence similarity
+# Start new chunk when similarity drops below ${similarityThreshold}`;
+  }
+
+  return `# This is a custom chunking strategy: ${strategy}
+# Implement using your custom splitter logic.`;
+}
+
+async function copyLangChainCode() {
+  const code = generateLangChainCode();
+  await navigator.clipboard.writeText(code);
+  alert("LangChain code copied to clipboard");
+}
+
+async function getRecommendation() {
+  setLoading(true);
+  setError("");
+  setRecommendation(null);
+
+  try {
+    const res = await fetch(`${API_URL}/recommend-strategy`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        text,
+        strategy,
+        chunk_size: chunkSize,
+        chunk_overlap: chunkOverlap,
+        similarity_threshold: similarityThreshold,
+      }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data?.detail || "Recommendation failed");
+    }
+
+    setRecommendation(data);
+  } catch (err) {
+    setError(err instanceof Error ? err.message : "Unknown error");
+  } finally {
+    setLoading(false);
+  }
+}
+
   return (
     <main className="min-h-screen bg-gray-950 text-white p-8">
       <h1 className="text-3xl font-bold mb-2">
@@ -129,6 +342,7 @@ async function compareStrategies() {
             value={strategy}
             onChange={(e) => setStrategy(e.target.value)}
           >
+            <option value="semantic_similarity">Semantic Similarity</option>
             <option value="recursive">LangChain Recursive</option>
             <option value="fixed_character">Fixed Character</option>
             <option value="fixed_word">Fixed Word</option>
@@ -163,8 +377,29 @@ async function compareStrategies() {
             value={chunkOverlap}
             onChange={(e) => setChunkOverlap(Number(e.target.value))}
           />
+            {strategy === "semantic_similarity" && (
+            <div className="mb-4">
+              <label className="block mb-2 text-sm text-gray-300">
+                Semantic Similarity Threshold: {similarityThreshold}
+              </label>
 
+              <input
+                type="range"
+                min="0.5"
+                max="0.95"
+                step="0.05"
+                value={similarityThreshold}
+                onChange={(e) => setSimilarityThreshold(Number(e.target.value))}
+                className="w-full"
+              />
+
+              <p className="text-xs text-gray-400 mt-2">
+                Lower value = fewer/larger chunks. Higher value = more/smaller chunks.
+              </p>
+            </div>
+          )}
           <button
+          
             onClick={runChunking}
             disabled={loading || (!text.trim() && !file)}
             className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-700 p-3 rounded font-semibold"
@@ -177,6 +412,20 @@ async function compareStrategies() {
             className="w-full mt-3 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-700 p-3 rounded font-semibold"
           >
             Compare Strategies
+          </button>
+          <button
+            onClick={compareRecursiveSemantic}
+            disabled={loading || !text.trim()}
+            className="w-full mt-3 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-700 p-3 rounded font-semibold"
+          >
+            Compare Recursive vs Semantic
+          </button>
+          <button
+            onClick={getRecommendation}
+            disabled={loading || !text.trim()}
+            className="w-full mt-3 bg-amber-600 hover:bg-amber-700 disabled:bg-gray-700 p-3 rounded font-semibold"
+          >
+            Recommend Best Strategy
           </button>
         </section>
 
@@ -265,6 +514,32 @@ async function compareStrategies() {
               </p>
             </section>
           )}
+          <section className="mt-8 bg-gray-900 border border-gray-800 rounded-xl p-5">
+            <h2 className="text-xl font-semibold mb-4">Developer Actions</h2>
+
+            <div className="flex flex-wrap gap-3">
+              <button
+                onClick={exportJson}
+                className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded font-semibold"
+              >
+                Export JSON
+              </button>
+
+              <button
+                onClick={copyChunks}
+                className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded font-semibold"
+              >
+                Copy Chunks
+              </button>
+
+              <button
+                onClick={copyLangChainCode}
+                className="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded font-semibold"
+              >
+                Copy LangChain Code
+              </button>
+            </div>
+          </section>
           <section className="grid grid-cols-2 md:grid-cols-5 gap-4 mt-8">
             <Stat title="Total Chunks" value={result.stats.total_chunks} />
             <Stat title="Avg Chars" value={result.stats.avg_characters} />
@@ -272,7 +547,25 @@ async function compareStrategies() {
             <Stat title="Max Chars" value={result.stats.max_characters} />
             <Stat title="Avg Words" value={result.stats.avg_words} />
           </section>
-            
+          {recursiveSemanticResult && (
+  <section className="mt-8 bg-gray-900 border border-gray-800 rounded-xl p-5">
+    <h2 className="text-2xl font-bold mb-6">
+      Recursive vs Semantic Comparison
+    </h2>
+
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <CompareColumn
+        title="Recursive Character Splitter"
+        result={recursiveSemanticResult.recursive}
+      />
+
+      <CompareColumn
+        title="Semantic Similarity Chunking"
+        result={recursiveSemanticResult.semantic}
+      />
+    </div>
+  </section>
+)}
           <section className="mt-8">
             <h2 className="text-2xl font-bold mb-4">Chunks</h2>
 
@@ -282,13 +575,49 @@ async function compareStrategies() {
                   key={chunk.chunk_id}
                   className="bg-gray-900 border border-gray-800 rounded-xl p-5"
                 >
+                  
                   <div className="flex justify-between mb-3">
                     <h3 className="font-semibold">Chunk {chunk.chunk_id}</h3>
                     <span className="text-sm text-gray-400">
                       {chunk.character_count} chars • {chunk.word_count} words
                     </span>
                   </div>
+                    {chunk.metadata && Object.keys(chunk.metadata).length > 0 && (
+                    <div className="mb-4 rounded-lg bg-gray-800 border border-gray-700 p-3">
+                      <div className="flex flex-wrap gap-2 mb-2">
 
+                        {chunk.metadata.type && (
+                          <span className="bg-blue-600 text-white text-xs px-2 py-1 rounded-full">
+                            {String(chunk.metadata.type)}
+                          </span>
+                        )}
+
+                        {chunk.metadata.break_reason && (
+                          <span className="bg-purple-600 text-white text-xs px-2 py-1 rounded-full">
+                            {String(chunk.metadata.break_reason)}
+                          </span>
+                        )}
+
+                      </div>
+
+                      {chunk.metadata.similarity_score && (
+                        <div>
+                          <div className="text-xs text-gray-300 mb-1">
+                            Similarity Score: {Number(chunk.metadata.similarity_score).toFixed(3)}
+                          </div>
+
+                          <div className="w-full bg-gray-700 rounded-full h-2">
+                            <div
+                              className="bg-green-500 h-2 rounded-full"
+                              style={{
+                                width: `${Number(chunk.metadata.similarity_score) * 100}%`,
+                              }}
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
                   <p className="text-gray-300 whitespace-pre-wrap">
                     {chunk.text}
                   </p>
@@ -307,6 +636,32 @@ async function compareStrategies() {
               {error}
             </div>
           )}
+          {recommendation && (
+          <section className="mt-8 bg-amber-950 border border-amber-800 rounded-xl p-5">
+            <h2 className="text-xl font-semibold mb-2">
+              Recommended Strategy
+            </h2>
+
+            <p className="text-2xl font-bold text-amber-200">
+              {recommendation.recommended_strategy}
+            </p>
+
+            <p className="text-sm text-amber-300 mt-2">
+              Confidence: {recommendation.confidence}
+            </p>
+
+            <p className="text-gray-200 mt-3">
+              {recommendation.reason}
+            </p>
+
+            <button
+              onClick={() => setStrategy(recommendation.recommended_strategy)}
+              className="mt-4 bg-amber-600 hover:bg-amber-700 px-4 py-2 rounded font-semibold"
+            >
+              Use This Strategy
+            </button>
+          </section>
+        )}
         </>
       )}
     </main>
@@ -319,6 +674,74 @@ function Stat({ title, value }: { title: string; value: number }) {
     <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
       <p className="text-gray-400 text-sm">{title}</p>
       <p className="text-2xl font-bold">{value}</p>
+    </div>
+  );
+}
+
+function CompareColumn({
+  title,
+  result,
+}: {
+  title: string;
+  result: ChunkResponse;
+}) {
+  return (
+    <div className="bg-gray-950 border border-gray-800 rounded-xl p-4">
+      <h3 className="text-lg font-semibold mb-3">{title}</h3>
+
+      <div className="grid grid-cols-2 gap-3 mb-4">
+        <div className="bg-gray-900 rounded p-3">
+          <p className="text-xs text-gray-400">Total Chunks</p>
+          <p className="text-xl font-bold">{result.stats.total_chunks}</p>
+        </div>
+
+        <div className="bg-gray-900 rounded p-3">
+          <p className="text-xs text-gray-400">Avg Chars</p>
+          <p className="text-xl font-bold">{result.stats.avg_characters}</p>
+        </div>
+      </div>
+
+      <div className="space-y-3 max-h-[600px] overflow-y-auto pr-2">
+        {result.chunks.map((chunk) => (
+          <div
+            key={chunk.chunk_id}
+            className="bg-gray-900 border border-gray-800 rounded-lg p-3"
+          >
+            <div className="flex justify-between mb-2">
+              <span className="font-medium">Chunk {chunk.chunk_id}</span>
+              <span className="text-xs text-gray-400">
+                {chunk.character_count} chars
+              </span>
+            </div>
+
+            {chunk.metadata && Object.keys(chunk.metadata).length > 0 && (
+              <div className="mb-2 flex flex-wrap gap-2">
+                {chunk.metadata.type && (
+                  <span className="text-xs bg-blue-900 text-blue-200 px-2 py-1 rounded">
+                    {String(chunk.metadata.type)}
+                  </span>
+                )}
+
+                {chunk.metadata.break_reason && (
+                  <span className="text-xs bg-purple-900 text-purple-200 px-2 py-1 rounded">
+                    {String(chunk.metadata.break_reason)}
+                  </span>
+                )}
+
+                {chunk.metadata.similarity_score && (
+                  <span className="text-xs bg-green-900 text-green-200 px-2 py-1 rounded">
+                    Similarity: {String(chunk.metadata.similarity_score)}
+                  </span>
+                )}
+              </div>
+            )}
+
+            <p className="text-sm text-gray-300 whitespace-pre-wrap">
+              {chunk.text}
+            </p>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
