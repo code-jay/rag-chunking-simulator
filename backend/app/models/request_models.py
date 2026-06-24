@@ -36,9 +36,17 @@ class CompareRequest(BaseModel):
         "fixed_character",
         "fixed_word",
         "fixed_token",
+        "sliding_window",
         "recursive",
         "paragraph",
-        "sentence"
+        "sentence",
+        "markdown_header",
+        "html_header",
+        "json_recursive",
+        "python_code",
+        "javascript_code",
+        "semantic_similarity",
     ]
     chunk_size: int = 800
     chunk_overlap: int = 120
+    similarity_threshold: float = 0.70

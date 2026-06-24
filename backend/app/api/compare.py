@@ -15,7 +15,9 @@ def compare_strategies(request: CompareRequest):
                 text=request.text,
                 strategy=strategy,
                 chunk_size=request.chunk_size,
-                chunk_overlap=request.chunk_overlap
+                chunk_overlap=request.chunk_overlap,
+                similarity_threshold=request.similarity_threshold
+
             )
 
             results.append({
@@ -50,7 +52,9 @@ def compare_recursive_semantic(request: CompareRequest):
             text=request.text,
             strategy="semantic_similarity",
             chunk_size=request.chunk_size,
-            chunk_overlap=request.chunk_overlap
+            chunk_overlap=request.chunk_overlap,
+            similarity_threshold=request.similarity_threshold
+
         )
 
         return {
