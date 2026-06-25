@@ -338,34 +338,43 @@ http://localhost:3000
 
 # 📸 Screenshots
 
-## Dashboard
+<table>
+<tr>
+<td align="center">
+<b>Dashboard</b><br>
+<img src="screenshots/dashboard.png" width="450">
+</td>
 
-![Dashboard](screenshots/dashboard.png)
+<td align="center">
+<b>Strategy comparison</b><br>
+<img src="screenshots/strategy-comparision.png" width="450">
+</td>
+</tr>
 
-## Strategy comparison
+<tr>
+<td align="center">
+<b>AI recommendation</b><br>
+<img src="screenshots/recommendation.png" width="450">
+</td>
 
-![Dashboard](screenshots/strategy-comparision.png)
+<td align="center">
+<b>Chunking</b><br>
+<img src="screenshots/run-chunking.png" width="450">
+</td>
+</tr>
 
-## AI recommendation
+<tr>
+<td align="center">
+<b>Recursive vs Sementic comparison</b><br>
+<img src="screenshots/recursive-vs-sementic.png" width="450">
+</td>
 
-![Dashboard](screenshots/recommendation.png)
-
-## Chunking
-
-![Dashboard](screenshots/run-chunking.png)
-
-
-## Recursive vs Sementic comparison
-
-![Dashboard](screenshots/recursive-vs-sementic.png)
-
-## Developer Tool
-
-![Dashboard](screenshots/developer-tools.png)
-
-## Metadata Filter
-
-![Dashboard](screenshots/metadata-filter.png)
+<td align="center">
+<b>Developer Tool</b><br>
+<img src="screenshots/developer-tools.pn" width="450">
+</td>
+</tr>
+</table>
 
 ---
 
