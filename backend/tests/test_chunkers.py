@@ -4,6 +4,14 @@ from app.chunkers.fixed_chunker import (
     fixed_word_chunk,
     sliding_window_chunk,
 )
+from app.chunkers.metadata_enhanced_chunker import (
+    metadata_enhanced_chunk,
+    detect_source_type,
+    detect_language,
+    has_code_like_content,
+    has_table_like_content,
+)
+
 from app.chunkers.paragraph_chunker import paragraph_chunk
 from app.chunkers.sentence_chunker import sentence_chunk
 from app.chunkers.recursive_chunker import recursive_character_chunk
@@ -326,3 +334,65 @@ def test_adaptive_hybrid_chunks_general_text():
     assert chunks[0]["metadata"]["type"] == "adaptive_hybrid"
     assert "selected_strategy" in chunks[0]["metadata"]
     assert "detected_document_type" in chunks[0]["metadata"]
+
+
+def test_metadata_enhanced_detects_markdown():
+    text = "# Title\n\nContent here."
+
+    assert detect_source_type(text) == "markdown"
+
+
+def test_metadata_enhanced_detects_json():
+    text = '{"company":"Altmatic"}'
+
+    assert detect_source_type(text) == "json"
+
+
+def test_metadata_enhanced_detects_python_code():
+    text = "class Chunker:\n    def split(self):\n        pass"
+
+    assert detect_source_type(text) == "python_code"
+
+
+def test_metadata_enhanced_detects_language_english():
+    text = "Enterprise AI systems need document processing."
+
+    assert detect_language(text) == "english"
+
+
+def test_metadata_enhanced_detects_code_content():
+    text = "def split_text(text):\n    return text.split()"
+
+    assert has_code_like_content(text) is True
+
+
+def test_metadata_enhanced_detects_table_content():
+    text = "Name,Age,City,Role\nJay,46,Bangalore,Architect"
+
+    assert has_table_like_content(text) is True
+
+
+def test_metadata_enhanced_chunk():
+    text = """
+# Enterprise AI
+
+Enterprise AI systems need document processing.
+
+## RAG Pipeline
+
+Chunking improves retrieval.
+"""
+
+    chunks = metadata_enhanced_chunk(
+        text=text,
+        chunk_size=120,
+        chunk_overlap=20,
+    )
+
+    assert len(chunks) >= 1
+    assert chunks[0]["metadata"]["type"] == "metadata_enhanced"
+    assert "source_type" in chunks[0]["metadata"]
+    assert "language" in chunks[0]["metadata"]
+    assert "section" in chunks[0]["metadata"]
+    assert "chunk_index" in chunks[0]["metadata"]
+    assert "total_chunks" in chunks[0]["metadata"]

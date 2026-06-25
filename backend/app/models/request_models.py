@@ -46,6 +46,9 @@ class CompareRequest(BaseModel):
         "python_code",
         "javascript_code",
         "semantic_similarity",
+        "metadata_enhanced",
+        "parent_child",
+        "adaptive_hybrid",
     ]
     chunk_size: int = 800
     chunk_overlap: int = 120

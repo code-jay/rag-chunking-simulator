@@ -21,7 +21,7 @@ from app.services.validation_service import validate_chunk_request
 from app.services.evaluation_service import evaluate_chunks
 from app.chunkers.parent_child_chunker import parent_child_chunk
 from app.chunkers.adaptive_hybrid_chunker import adaptive_hybrid_chunk
-
+from app.chunkers.metadata_enhanced_chunker import metadata_enhanced_chunk
 
 SUPPORTED_STRATEGIES = [
     {"id": "fixed_character", "name": "Fixed Character Chunking", "category": "basic"},
@@ -39,6 +39,7 @@ SUPPORTED_STRATEGIES = [
     {"id": "semantic_similarity", "name": "Semantic Similarity Chunking", "category": "semantic"},
     {"id": "parent_child", "name": "Hierarchical Parent-Child Chunking", "category": "hierarchical"},
     {"id": "adaptive_hybrid","name": "Adaptive Hybrid Chunking","category": "hybrid"},
+    {"id": "metadata_enhanced", "name": "Metadata Enhanced Chunking", "category": "metadata"}
 ]
 
 
@@ -104,6 +105,12 @@ def chunk_text(text: str, strategy: str, chunk_size: int, chunk_overlap: int, si
             chunk_size=chunk_size,
             chunk_overlap=chunk_overlap,
             similarity_threshold=similarity_threshold,
+        )
+    elif strategy == "metadata_enhanced":
+        raw_chunks = metadata_enhanced_chunk(
+            text=text,
+            chunk_size=chunk_size,
+            chunk_overlap=chunk_overlap,
         )
     else:
         raise ValueError(f"Unsupported chunking strategy: {strategy}")

@@ -14,6 +14,7 @@ type TabType = "chunks" | "comparison" | "recursiveSemantic" | "developer" | "me
 
 const STRATEGIES = [
   { id: "adaptive_hybrid", label: "Adaptive Hybrid", hint: "Automatically detects document type and chooses the best chunker"},
+  {id: "metadata_enhanced",label: "Metadata Enhanced",hint: "Adds rich metadata for filtering, traceability, and governance"},
   { id: "recursive", label: "LangChain Recursive", hint: "Best default for PDF, DOCX, TXT" },
   { id: "semantic_similarity", label: "Semantic Similarity", hint: "Best for topic-shift splitting" },
   { id: "parent_child", label: "Parent-Child", hint: "Hierarchical chunks: child retrieval with parent context"},
@@ -648,6 +649,40 @@ function MetadataBadges({ metadata }: { metadata?: Record<string, unknown> }) {
         {metadata.selection_reason && (
           <p className="mt-2 text-xs text-gray-400">
             {String(metadata.selection_reason)}
+          </p>
+        )}
+        {metadata.source_type && (
+          <span className="rounded-full bg-cyan-600 px-2 py-1 text-xs text-white">
+            Source: {String(metadata.source_type)}
+          </span>
+        )}
+
+        {metadata.section && (
+          <span className="rounded-full bg-indigo-600 px-2 py-1 text-xs text-white">
+            Section: {String(metadata.section)}
+          </span>
+        )}
+
+        {metadata.language && (
+          <span className="rounded-full bg-green-600 px-2 py-1 text-xs text-white">
+            Lang: {String(metadata.language)}
+          </span>
+        )}
+
+        {metadata.has_code !== undefined && (
+          <span className="rounded-full bg-pink-600 px-2 py-1 text-xs text-white">
+            Code: {String(metadata.has_code)}
+          </span>
+        )}
+
+        {metadata.has_table !== undefined && (
+          <span className="rounded-full bg-orange-600 px-2 py-1 text-xs text-white">
+            Table: {String(metadata.has_table)}
+          </span>
+        )}
+        {metadata.retrieval_use && (
+          <p className="mt-2 text-xs text-gray-400">
+            Retrieval Use: {String(metadata.retrieval_use)}
           </p>
         )}
       </div>
