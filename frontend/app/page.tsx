@@ -26,6 +26,7 @@ const STRATEGIES = [
   { id: "json_recursive", label: "Recursive JSON", hint: "For valid JSON only" },
   { id: "python_code", label: "Python Code", hint: "For Python source" },
   { id: "javascript_code", label: "JavaScript Code", hint: "For JS/TS source" },
+  { id: "parent_child", label: "Parent-Child", hint: "Hierarchical chunks: child retrieval with parent context"},
 ];
 
 const SAMPLES: Record<string, string> = {
@@ -615,6 +616,17 @@ function MetadataBadges({ metadata }: { metadata?: Record<string, unknown> }) {
       <div className="mb-2 flex flex-wrap gap-2">
         {metadata.type && <span className="rounded-full bg-blue-600 px-2 py-1 text-xs text-white">{String(metadata.type)}</span>}
         {metadata.break_reason && <span className="rounded-full bg-purple-600 px-2 py-1 text-xs text-white">{String(metadata.break_reason)}</span>}
+        {metadata.parent_id && (
+          <span className="rounded-full bg-cyan-600 px-2 py-1 text-xs text-white">
+            Parent: {String(metadata.parent_id)}
+          </span>
+        )}
+
+        {metadata.child_id && (
+          <span className="rounded-full bg-pink-600 px-2 py-1 text-xs text-white">
+            Child: {String(metadata.child_id)}
+          </span>
+        )}
       </div>
       {similarity !== null && <><div className="mb-1 text-xs text-gray-300">Similarity Score: {similarity.toFixed(3)}</div><div className="h-2 w-full rounded-full bg-gray-700"><div className="h-2 rounded-full bg-green-500" style={{ width: `${similarity * 100}%` }} /></div></>}
     </div>

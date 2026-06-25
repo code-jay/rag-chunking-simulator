@@ -12,6 +12,7 @@ from app.chunkers.html_chunker import html_header_chunk
 from app.chunkers.json_chunker import json_chunk
 from app.chunkers.code_chunker import python_code_chunk, javascript_code_chunk
 from app.chunkers.semantic_chunker import semantic_similarity_chunk
+from app.chunkers.parent_child_chunker import parent_child_chunk
 
 
 def test_fixed_character_chunk():
@@ -248,3 +249,31 @@ def test_paragraph_chunk_removes_empty_paragraphs():
     chunks = paragraph_chunk(text)
 
     assert len(chunks) == 2
+
+def test_parent_child_chunk():
+    text = """
+Enterprise AI systems require scalable document processing.
+
+Chunking is important before embeddings.
+
+Metadata improves retrieval.
+
+Vector databases store chunks.
+
+RAG combines retrieval with generation.
+"""
+
+    chunks = parent_child_chunk(
+        text=text,
+        parent_chunk_size=200,
+        parent_chunk_overlap=20,
+        child_chunk_size=80,
+        child_chunk_overlap=10,
+    )
+
+    assert len(chunks) >= 1
+    assert chunks[0]["metadata"]["type"] == "parent_child"
+    assert "parent_id" in chunks[0]["metadata"]
+    assert "child_id" in chunks[0]["metadata"]
+    assert chunks[0]["metadata"]["retrieval_role"] == "child"
+    assert chunks[0]["metadata"]["context_role"] == "parent"

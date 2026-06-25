@@ -19,7 +19,7 @@ from app.chunkers.semantic_chunker import semantic_similarity_chunk
 from app.services.validation_service import validate_chunk_request
 
 from app.services.evaluation_service import evaluate_chunks
-
+from app.chunkers.parent_child_chunker import parent_child_chunk
 
 
 SUPPORTED_STRATEGIES = [
@@ -35,7 +35,8 @@ SUPPORTED_STRATEGIES = [
     {"id": "json_recursive", "name": "LangChain Recursive JSON Chunking", "category": "langchain"},
     {"id": "python_code", "name": "Python Code Chunking", "category": "code"},
     {"id": "javascript_code", "name": "JavaScript Code Chunking", "category": "code"},
-    {"id": "semantic_similarity", "name": "Semantic Similarity Chunking", "category": "semantic"}
+    {"id": "semantic_similarity", "name": "Semantic Similarity Chunking", "category": "semantic"},
+    {"id": "parent_child", "name": "Hierarchical Parent-Child Chunking", "category": "hierarchical"}
 ]
 
 
@@ -87,6 +88,14 @@ def chunk_text(text: str, strategy: str, chunk_size: int, chunk_overlap: int, si
     
     elif strategy == "semantic_similarity":
         raw_chunks = semantic_similarity_chunk( text=text, similarity_threshold=similarity_threshold)
+    elif strategy == "parent_child":
+        raw_chunks = parent_child_chunk(
+            text=text,
+            parent_chunk_size=chunk_size * 3,
+            parent_chunk_overlap=chunk_overlap * 2,
+            child_chunk_size=chunk_size,
+            child_chunk_overlap=chunk_overlap,
+        )
     
     else:
         raise ValueError(f"Unsupported chunking strategy: {strategy}")
