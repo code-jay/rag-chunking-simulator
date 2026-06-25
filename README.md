@@ -338,13 +338,34 @@ http://localhost:3000
 
 # 📸 Screenshots
 
-> Add screenshots after deployment.
+## Dashboard
 
-- Dashboard
-- Strategy Comparison
-- Recursive vs Semantic
-- Metadata Visualization
-- Recommendation Engine
+![Dashboard](screenshots/dashboard.png)
+
+## Strategy comparison
+
+![Dashboard](screenshots/strategy-comparision.png)
+
+## AI recommendation
+
+![Dashboard](screenshots/recommendation.png)
+
+## Chunking
+
+![Dashboard](screenshots/run-chunking.png)
+
+
+## Recursive vs Sementic comparison
+
+![Dashboard](screenshots/recursive-vs-sementic.png)
+
+## Developer Tool
+
+![Dashboard](screenshots/developer-tools.png)
+
+## Metadata Filter
+
+![Dashboard](screenshots/metadata-filter.png)
 
 ---
 
@@ -405,8 +426,8 @@ MIT License
 
 AI Engineer | Enterprise AI Architect | RAG & LLM Systems
 
-- GitHub: *Add your GitHub profile*
-- LinkedIn: *Add your LinkedIn profile*
+- GitHub: https://github.com/code-jay
+- LinkedIn: https://www.linkedin.com/in/jayram/
 
 ---
 
