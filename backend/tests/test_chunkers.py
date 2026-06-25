@@ -277,3 +277,52 @@ RAG combines retrieval with generation.
     assert "child_id" in chunks[0]["metadata"]
     assert chunks[0]["metadata"]["retrieval_role"] == "child"
     assert chunks[0]["metadata"]["context_role"] == "parent"
+
+
+from app.chunkers.adaptive_hybrid_chunker import (
+    adaptive_hybrid_chunk,
+    detect_document_type,
+)
+
+
+def test_adaptive_hybrid_detects_json():
+    text = '{"company":"Altmatic","type":"rag"}'
+
+    detection = detect_document_type(text)
+
+    assert detection["document_type"] == "json"
+    assert detection["recommended_strategy"] == "json_recursive"
+
+
+def test_adaptive_hybrid_detects_markdown():
+    text = "# Title\n\n## Section\n\nContent here."
+
+    detection = detect_document_type(text)
+
+    assert detection["document_type"] == "markdown"
+    assert detection["recommended_strategy"] == "markdown_header"
+
+
+def test_adaptive_hybrid_detects_python():
+    text = "class ChunkService:\n    def split(self):\n        pass"
+
+    detection = detect_document_type(text)
+
+    assert detection["document_type"] == "python_code"
+    assert detection["recommended_strategy"] == "python_code"
+
+
+def test_adaptive_hybrid_chunks_general_text():
+    text = "Enterprise AI systems need good document chunking. Recursive chunking is a good default."
+
+    chunks = adaptive_hybrid_chunk(
+        text=text,
+        chunk_size=100,
+        chunk_overlap=10,
+        similarity_threshold=0.7,
+    )
+
+    assert len(chunks) >= 1
+    assert chunks[0]["metadata"]["type"] == "adaptive_hybrid"
+    assert "selected_strategy" in chunks[0]["metadata"]
+    assert "detected_document_type" in chunks[0]["metadata"]

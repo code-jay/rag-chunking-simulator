@@ -13,8 +13,10 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL;
 type TabType = "chunks" | "comparison" | "recursiveSemantic" | "developer" | "metadata";
 
 const STRATEGIES = [
+  { id: "adaptive_hybrid", label: "Adaptive Hybrid", hint: "Automatically detects document type and chooses the best chunker"},
   { id: "recursive", label: "LangChain Recursive", hint: "Best default for PDF, DOCX, TXT" },
   { id: "semantic_similarity", label: "Semantic Similarity", hint: "Best for topic-shift splitting" },
+  { id: "parent_child", label: "Parent-Child", hint: "Hierarchical chunks: child retrieval with parent context"},
   { id: "fixed_character", label: "Fixed Character", hint: "Character-size baseline" },
   { id: "fixed_word", label: "Fixed Word", hint: "Word-size baseline" },
   { id: "fixed_token", label: "Fixed Token", hint: "Token-size baseline" },
@@ -25,8 +27,7 @@ const STRATEGIES = [
   { id: "html_header", label: "HTML Header", hint: "For HTML heading tags" },
   { id: "json_recursive", label: "Recursive JSON", hint: "For valid JSON only" },
   { id: "python_code", label: "Python Code", hint: "For Python source" },
-  { id: "javascript_code", label: "JavaScript Code", hint: "For JS/TS source" },
-  { id: "parent_child", label: "Parent-Child", hint: "Hierarchical chunks: child retrieval with parent context"},
+  { id: "javascript_code", label: "JavaScript Code", hint: "For JS/TS source" }
 ];
 
 const SAMPLES: Record<string, string> = {
@@ -626,6 +627,28 @@ function MetadataBadges({ metadata }: { metadata?: Record<string, unknown> }) {
           <span className="rounded-full bg-pink-600 px-2 py-1 text-xs text-white">
             Child: {String(metadata.child_id)}
           </span>
+        )}
+        {metadata.selected_strategy && (
+          <span className="rounded-full bg-amber-600 px-2 py-1 text-xs text-white">
+            Strategy: {String(metadata.selected_strategy)}
+          </span>
+        )}
+
+        {metadata.detected_document_type && (
+          <span className="rounded-full bg-cyan-600 px-2 py-1 text-xs text-white">
+            Type: {String(metadata.detected_document_type)}
+          </span>
+        )}
+
+        {metadata.confidence && (
+          <span className="rounded-full bg-green-600 px-2 py-1 text-xs text-white">
+            Confidence: {String(metadata.confidence)}
+          </span>
+        )}
+        {metadata.selection_reason && (
+          <p className="mt-2 text-xs text-gray-400">
+            {String(metadata.selection_reason)}
+          </p>
         )}
       </div>
       {similarity !== null && <><div className="mb-1 text-xs text-gray-300">Similarity Score: {similarity.toFixed(3)}</div><div className="h-2 w-full rounded-full bg-gray-700"><div className="h-2 rounded-full bg-green-500" style={{ width: `${similarity * 100}%` }} /></div></>}

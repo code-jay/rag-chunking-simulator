@@ -20,6 +20,7 @@ from app.services.validation_service import validate_chunk_request
 
 from app.services.evaluation_service import evaluate_chunks
 from app.chunkers.parent_child_chunker import parent_child_chunk
+from app.chunkers.adaptive_hybrid_chunker import adaptive_hybrid_chunk
 
 
 SUPPORTED_STRATEGIES = [
@@ -36,7 +37,8 @@ SUPPORTED_STRATEGIES = [
     {"id": "python_code", "name": "Python Code Chunking", "category": "code"},
     {"id": "javascript_code", "name": "JavaScript Code Chunking", "category": "code"},
     {"id": "semantic_similarity", "name": "Semantic Similarity Chunking", "category": "semantic"},
-    {"id": "parent_child", "name": "Hierarchical Parent-Child Chunking", "category": "hierarchical"}
+    {"id": "parent_child", "name": "Hierarchical Parent-Child Chunking", "category": "hierarchical"},
+    {"id": "adaptive_hybrid","name": "Adaptive Hybrid Chunking","category": "hybrid"},
 ]
 
 
@@ -96,7 +98,13 @@ def chunk_text(text: str, strategy: str, chunk_size: int, chunk_overlap: int, si
             child_chunk_size=chunk_size,
             child_chunk_overlap=chunk_overlap,
         )
-    
+    elif strategy == "adaptive_hybrid":
+        raw_chunks = adaptive_hybrid_chunk(
+            text=text,
+            chunk_size=chunk_size,
+            chunk_overlap=chunk_overlap,
+            similarity_threshold=similarity_threshold,
+        )
     else:
         raise ValueError(f"Unsupported chunking strategy: {strategy}")
 
