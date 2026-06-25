@@ -1,4 +1,4 @@
-# 🚀 RAG Chunking Strategy Simulator
+# RAG Chunking Strategy Simulator
 
 > **An interactive Enterprise AI tool to learn, compare, visualize, and evaluate chunking strategies for Retrieval-Augmented Generation (RAG).**
 
