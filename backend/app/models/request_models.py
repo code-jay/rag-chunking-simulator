@@ -49,7 +49,8 @@ class CompareRequest(BaseModel):
         "metadata_enhanced",
         "parent_child",
         "adaptive_hybrid",
-        "summary_attached"
+        "summary_attached",
+        "llm_assisted"
     ]
     chunk_size: int = 800
     chunk_overlap: int = 120

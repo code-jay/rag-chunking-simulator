@@ -23,6 +23,7 @@ from app.chunkers.parent_child_chunker import parent_child_chunk
 from app.chunkers.adaptive_hybrid_chunker import adaptive_hybrid_chunk
 from app.chunkers.metadata_enhanced_chunker import metadata_enhanced_chunk
 from app.chunkers.summary_attached_chunker import summary_attached_chunk
+from app.chunkers.llm_assisted_chunker import llm_assisted_chunk
 
 SUPPORTED_STRATEGIES = [
     {"id": "fixed_character", "name": "Fixed Character Chunking", "category": "basic"},
@@ -41,7 +42,8 @@ SUPPORTED_STRATEGIES = [
     {"id": "parent_child", "name": "Hierarchical Parent-Child Chunking", "category": "hierarchical"},
     {"id": "adaptive_hybrid","name": "Adaptive Hybrid Chunking","category": "hybrid"},
     {"id": "metadata_enhanced", "name": "Metadata Enhanced Chunking", "category": "metadata"},
-    {"id": "summary_attached","name": "Summary Attached Chunking","category": "summary"}
+    {"id": "summary_attached","name": "Summary Attached Chunking","category": "summary"},
+    {"id": "llm_assisted","name": "LLM Assisted Chunking","category": "llm"}
 ]
 
 
@@ -116,6 +118,12 @@ def chunk_text(text: str, strategy: str, chunk_size: int, chunk_overlap: int, si
         )
     elif strategy == "summary_attached":
         raw_chunks = summary_attached_chunk(
+            text=text,
+            chunk_size=chunk_size,
+            chunk_overlap=chunk_overlap,
+        )
+    elif strategy == "llm_assisted":
+        raw_chunks = llm_assisted_chunk(
             text=text,
             chunk_size=chunk_size,
             chunk_overlap=chunk_overlap,

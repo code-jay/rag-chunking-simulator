@@ -17,3 +17,4 @@ backend/uploads/
 backend/output/
 
 backend/models/
+backend/.env

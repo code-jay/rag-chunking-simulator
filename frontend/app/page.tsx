@@ -19,6 +19,7 @@ const STRATEGIES = [
   { id: "semantic_similarity", label: "Semantic Similarity", hint: "Best for topic-shift splitting" },
   { id: "parent_child", label: "Parent-Child", hint: "Hierarchical chunks: child retrieval with parent context"},
   { id: "summary_attached", label: "Summary Attached", hint: "Adds short summary and keywords to each chunk"},
+  { id: "llm_assisted",label: "LLM Assisted",hint: "Uses an LLM to create retrieval-optimized chunk boundaries"},
   { id: "fixed_character", label: "Fixed Character", hint: "Character-size baseline" },
   { id: "fixed_word", label: "Fixed Word", hint: "Word-size baseline" },
   { id: "fixed_token", label: "Fixed Token", hint: "Token-size baseline" },
@@ -693,6 +694,30 @@ function MetadataBadges({ metadata }: { metadata?: Record<string, unknown> }) {
               {String(metadata.summary)}
             </p>
           </div>
+        )}
+
+        {metadata.chunk_title && (
+          <span className="rounded-full bg-yellow-600 px-2 py-1 text-xs text-white">
+            {String(metadata.chunk_title)}
+          </span>
+        )}
+
+        {metadata.mode && (
+          <span className="rounded-full bg-gray-600 px-2 py-1 text-xs text-white">
+            Mode: {String(metadata.mode)}
+          </span>
+        )}
+
+        {metadata.reason && (
+          <p className="mt-2 text-xs text-gray-400">
+            Reason: {String(metadata.reason)}
+          </p>
+        )}
+
+        {metadata.llm_error && (
+          <p className="mt-2 text-xs text-red-400">
+            LLM Error: {String(metadata.llm_error)}
+          </p>
         )}
 
         {Array.isArray(metadata.keywords) && metadata.keywords.length > 0 && (
