@@ -1,177 +1,302 @@
-# RAG Chunking Strategy Simulator
+# 🚀 RAG Chunking Strategy Simulator
 
-A full-stack web-based simulator for testing, comparing, and understanding different chunking strategies used in RAG pipelines, Enterprise AI document processing, semantic search, and LLM applications.
+> **An interactive Enterprise AI tool to learn, compare, visualize, and evaluate chunking strategies for Retrieval-Augmented Generation (RAG).**
 
-This project helps developers visually understand how different chunking techniques affect document splitting, metadata, retrieval quality, and downstream embedding behavior.
-
----
-
-## Why This Project?
-
-Chunking is one of the most important steps in a RAG pipeline.
-
-Poor chunking can cause:
-
-- Broken context
-- Poor retrieval results
-- Duplicate chunks
-- Higher embedding cost
-- Weak LLM responses
-- Missing source traceability
-
-This simulator allows you to test chunking strategies before applying them in a production RAG system.
+![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)
+![FastAPI](https://img.shields.io/badge/FastAPI-Backend-009688.svg)
+![Next.js](https://img.shields.io/badge/Next.js-15-black.svg)
+![React](https://img.shields.io/badge/React-TypeScript-61DAFB.svg)
+![LangChain](https://img.shields.io/badge/LangChain-Supported-green.svg)
+![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 
 ---
 
-## Key Features
+## 📖 Overview
 
-### Text and File Input
+Chunking is one of the most important—but often overlooked—steps in a RAG pipeline.
 
-- Paste raw text
-- Upload documents
-- Extract text from supported files
-- Chunk uploaded files directly
+Different document types require different chunking strategies to maximize retrieval quality and LLM response accuracy.
 
-Supported file types:
+This simulator allows developers, AI engineers, and architects to:
 
-- `.txt`
-- `.md`
-- `.pdf`
-- `.docx`
-- `.html`
-- `.json`
-- `.csv`
-- `.py`
-- `.js`
-- `.ts`
-- `.tsx`
-- `.jsx`
+- Compare multiple chunking strategies
+- Visualize chunk boundaries
+- Evaluate chunk quality
+- Explore metadata generated during chunking
+- Understand when to use each strategy
+- Generate LangChain code snippets
+- Benchmark chunking approaches for enterprise AI systems
 
 ---
 
-## Supported Chunking Strategies
+# ✨ Features
 
-### Basic Chunking
+## 📚 Supported Chunking Strategies
 
-- Fixed Character Chunking
-- Fixed Word Chunking
-- Fixed Token Chunking
-- Sliding Window Chunking
-- Paragraph Chunking
-- Sentence Chunking
+### Basic
 
-### LangChain-Based Chunking
+- Fixed Character
+- Fixed Word
+- Fixed Token
+- Sliding Window
+- Paragraph
+- Sentence
 
-- RecursiveCharacterTextSplitter
-- MarkdownHeaderTextSplitter
-- HTMLHeaderTextSplitter
-- RecursiveJsonSplitter
-- Python Code Chunking
-- JavaScript Code Chunking
+### LangChain
 
-### Semantic Chunking
+- Recursive Character Splitter
+- Markdown Header Splitter
+- HTML Header Splitter
+- Recursive JSON Splitter
+- Python Code Splitter
+- JavaScript Code Splitter
+
+### AI-powered
 
 - Semantic Similarity Chunking
-- Sentence embedding based chunking
-- Topic-shift detection
-- Similarity threshold control
-
-Semantic chunking uses local embeddings with:
-
-```text
-sentence-transformers/all-MiniLM-L6-v2
-```
-
-No API key is required.
+  - Sentence Transformers
+  - Configurable similarity threshold
 
 ---
 
-## Current UI Features
+# 📄 Supported File Types
 
-- Strategy selector
-- Chunk size control
-- Chunk overlap control
-- Semantic similarity threshold slider
-- File upload
-- Chunk cards
-- Metadata badges
-- Similarity score display
-- Similarity progress bar
-- Strategy comparison table
-- Recursive vs Semantic side-by-side comparison
-- Recommended strategy card
+✅ TXT
+
+✅ Markdown
+
+✅ PDF
+
+✅ DOCX
+
+✅ HTML
+
+✅ JSON
+
+✅ CSV
+
+✅ Python
+
+✅ JavaScript
+
+✅ TypeScript
+
+✅ JSX / TSX
+
+---
+
+# 📊 Analysis Dashboard
+
+After processing a document the simulator displays
+
+- Total Chunks
+- Average Characters
+- Minimum Chunk Size
+- Maximum Chunk Size
+- Average Words
+
+---
+
+# 📈 Quality Evaluation
+
+The simulator automatically evaluates every chunking strategy.
+
+### Chunk Quality Score
+
+Evaluates
+
+- Chunk size consistency
+- Boundary quality
+- Readability
+
+---
+
+### Context Preservation Score
+
+Measures how well context is preserved across chunk boundaries.
+
+---
+
+### Metadata Score
+
+Shows how much useful metadata has been generated.
+
+---
+
+# 🏷 Metadata Visualization
+
+Each chunk can include metadata such as
+
+- Chunk Type
+- Break Reason
+- Similarity Score
+- Language
+- Section Information
+
+---
+
+# 🤖 AI Recommendation Engine
+
+The simulator analyzes the document and recommends the most suitable strategy.
+
+| Document | Recommendation |
+|-----------|---------------|
+| Plain Text | Recursive |
+| Markdown | Markdown Header |
+| HTML | HTML Header |
+| JSON | Recursive JSON |
+| Python | Python Code |
+| JavaScript | JavaScript Code |
+| Multi-topic Text | Semantic Similarity |
+
+---
+
+# ⚖ Strategy Comparison
+
+Compare every chunking strategy using
+
+- Total Chunks
+- Average Chunk Size
+- Minimum Size
+- Maximum Size
+- Average Words
+
+---
+
+# 🔄 Recursive vs Semantic Comparison
+
+Visual side-by-side comparison of
+
+- Recursive Character Splitter
+- Semantic Similarity Chunker
+
+Compare
+
+- Chunk boundaries
+- Metadata
+- Similarity
+- Chunk sizes
+
+---
+
+# 🛠 Developer Tools
+
 - Export JSON
-- Copy chunks
-- Copy generated LangChain code
-- Collapsible chunk cards
-- Tab-based layout
+- Copy Chunks
+- Generate LangChain Code
+- Copy LangChain Code
 
 ---
 
-## Architecture
+# 🧪 Testing
 
-```text
-Frontend: Next.js + TypeScript + Tailwind CSS
-        |
-        v
-Backend: FastAPI
-        |
-        v
-Chunk Service
-        |
-        +--> Basic Chunkers
-        +--> LangChain Chunkers
-        +--> Semantic Chunker
-        +--> Code Chunkers
-        +--> JSON / Markdown / HTML Chunkers
-        |
-        v
-Stats Service + Recommendation Service
-        |
-        v
-Frontend Visualization
-```
+Unit tests cover
 
----
+- Fixed Character Chunker
+- Fixed Word Chunker
+- Sliding Window Chunker
+- Paragraph Chunker
+- Sentence Chunker
+- Recursive Chunker
+- Markdown Chunker
+- HTML Chunker
+- JSON Chunker
+- Python Chunker
+- JavaScript Chunker
+- Semantic Chunker
 
-## Project Structure
-
-```text
-rag-chunking-simulator/
-│
-├── backend/
-│   ├── app/
-│   │   ├── api/
-│   │   ├── chunkers/
-│   │   ├── extractors/
-│   │   ├── models/
-│   │   ├── services/
-│   │   ├── utils/
-│   │   └── main.py
-│   ├── uploads/
-│   ├── models/
-│   └── requirements.txt
-│
-├── frontend/
-│   ├── app/
-│   │   └── page.tsx
-│   ├── types/
-│   │   └── chunking.ts
-│   ├── .env.local
-│   └── package.json
-│
-├── README.md
-└── .gitignore
-```
-
----
-
-## Backend Setup
+Run all tests
 
 ```bash
 cd backend
 
-python3 -m venv venv
+source venv/bin/activate
+
+pytest -v
+```
+
+---
+
+# 🏗 Architecture
+
+```
+                  +---------------------+
+                  |    Next.js UI       |
+                  +----------+----------+
+                             |
+                             |
+                  REST API (FastAPI)
+                             |
+      +----------------------+----------------------+
+      |                                             |
+      |                                             |
+Chunk Service                              Upload Service
+      |
+      |
++---------------------------+
+| Chunking Strategy Layer   |
++---------------------------+
+| Fixed                     |
+| Recursive                 |
+| Sliding                   |
+| Paragraph                 |
+| Sentence                  |
+| Markdown                  |
+| HTML                      |
+| JSON                      |
+| Code                      |
+| Semantic                  |
++---------------------------+
+             |
+             |
+Evaluation Engine
+             |
+             |
+Metadata + Statistics
+             |
+             |
+JSON Response
+```
+
+---
+
+# 📂 Project Structure
+
+```
+rag-chunking-simulator/
+
+├── backend/
+│   ├── app/
+│   │   ├── api/
+│   │   ├── chunkers/
+│   │   ├── services/
+│   │   ├── utils/
+│   │   └── main.py
+│   │
+│   ├── tests/
+│   ├── requirements.txt
+│   └── pytest.ini
+│
+├── frontend/
+│   ├── app/
+│   ├── components/
+│   ├── public/
+│   └── types/
+│
+└── README.md
+```
+
+---
+
+# 🚀 Installation
+
+## Backend
+
+```bash
+cd backend
+
+python -m venv venv
+
 source venv/bin/activate
 
 pip install -r requirements.txt
@@ -179,259 +304,110 @@ pip install -r requirements.txt
 uvicorn app.main:app --reload
 ```
 
-Backend:
+Backend
 
-```text
-http://127.0.0.1:8000
+```
+http://localhost:8000
 ```
 
-Swagger docs:
+Swagger
 
-```text
-http://127.0.0.1:8000/docs
 ```
-
-If dependencies are not yet saved, install manually:
-
-```bash
-pip install fastapi uvicorn python-multipart
-pip install langchain langchain-text-splitters
-pip install pypdf python-docx pandas openpyxl
-pip install tiktoken
-pip install sentence-transformers scikit-learn numpy
+http://localhost:8000/docs
 ```
 
 ---
 
-## HuggingFace Cache Fix
-
-Semantic chunking downloads a local embedding model.
-
-If you get HuggingFace permission errors, run:
-
-```bash
-export HF_HUB_DISABLE_XET=1
-export HF_HOME=$PWD/.hf_cache
-export TRANSFORMERS_CACHE=$PWD/.hf_cache
-mkdir -p .hf_cache models
-uvicorn app.main:app --reload
-```
-
-Recommended code-level setup inside `semantic_chunker.py`:
-
-```python
-import os
-
-os.environ["HF_HUB_DISABLE_XET"] = "1"
-os.environ["HF_HOME"] = "./.hf_cache"
-os.environ["TRANSFORMERS_CACHE"] = "./.hf_cache"
-```
-
----
-
-## Frontend Setup
+## Frontend
 
 ```bash
 cd frontend
 
 npm install
-```
 
-Create `.env.local`:
-
-```env
-NEXT_PUBLIC_API_URL=http://127.0.0.1:8000
-```
-
-Run frontend:
-
-```bash
 npm run dev
 ```
 
-Frontend:
+Frontend
 
-```text
+```
 http://localhost:3000
 ```
 
 ---
 
-## API Endpoints
+# 📸 Screenshots
 
-| Method | Endpoint | Description |
-|---|---|---|
-| GET | `/` | Backend health/status |
-| GET | `/health` | Health check |
-| GET | `/strategies` | List supported chunking strategies |
-| POST | `/chunk` | Chunk pasted text |
-| POST | `/upload-and-chunk` | Upload file and chunk extracted text |
-| POST | `/compare` | Compare multiple chunking strategies |
-| POST | `/compare-recursive-semantic` | Side-by-side recursive vs semantic comparison |
-| POST | `/recommend-strategy` | Recommend best chunking strategy |
+> Add screenshots after deployment.
+
+- Dashboard
+- Strategy Comparison
+- Recursive vs Semantic
+- Metadata Visualization
+- Recommendation Engine
 
 ---
 
-## Example `/chunk` Request
+# 🗺 Roadmap
 
-```json
-{
-  "text": "Enterprise AI systems require intelligent document processing. Chunking is important before embeddings.",
-  "strategy": "recursive",
-  "chunk_size": 800,
-  "chunk_overlap": 120,
-  "similarity_threshold": 0.7
-}
-```
+## ✅ Completed
 
----
-
-## Example Semantic Chunking Request
-
-```json
-{
-  "text": "Enterprise AI needs document processing. Football is a popular sport. Vector databases store embeddings.",
-  "strategy": "semantic_similarity",
-  "chunk_size": 800,
-  "chunk_overlap": 120,
-  "similarity_threshold": 0.7
-}
-```
-
----
-
-## Choosing the Right Chunking Strategy
-
-| Document Type | Recommended Strategy |
-|---|---|
-| General PDF/DOCX/TXT | Recursive Character |
-| Markdown | Markdown Header |
-| HTML | HTML Header |
-| JSON | Recursive JSON |
-| Python Code | Python Code Chunking |
-| JavaScript/TypeScript | JavaScript Code Chunking |
-| Short paragraphs | Paragraph Chunking |
-| Sentence-level analysis | Sentence Chunking |
-| Long mixed-topic content | Semantic Similarity |
-| Baseline RAG pipeline | Recursive Character |
-| Advanced RAG quality testing | Semantic Similarity |
-
----
-
-## Recursive vs Semantic Chunking
-
-### Recursive Character Chunking
-
-Best default for most RAG pipelines.
-
-Pros:
-
-- Fast
-- Stable
-- Simple
-- Good baseline
-- Preserves paragraphs and sentence boundaries better than fixed chunking
-
-### Semantic Similarity Chunking
-
-Best for meaning-based splitting.
-
-Pros:
-
-- Detects topic shifts
-- Useful for mixed-topic documents
-- Better for advanced RAG experiments
-
-Trade-offs:
-
-- Slower
-- Requires embedding model
-- More complex
-- May produce different output depending on threshold
-
----
-
-## Developer Actions
-
-The app supports:
-
-- Export chunks as JSON
-- Copy chunks to clipboard
-- Copy generated LangChain code
-- Compare strategies
-- Compare recursive vs semantic
-- Recommend best strategy
-
----
-
-## Validation Rules
-
-The backend validates:
-
-- Empty text
-- Invalid JSON for `json_recursive`
-- Invalid HTML for `html_header`
-- Invalid Markdown for `markdown_header`
-- Chunk overlap greater than or equal to chunk size
-- Unsupported strategy
-
----
-
-## Roadmap
-
-Planned improvements:
-
-- LLM-based chunking
-- Agentic chunking
-- Hybrid chunking
-- Table-aware chunking
-- Legal clause chunking
-- Email thread chunking
-- Retrieval simulation
-- Embedding similarity visualization
-- Chunk quality score
-- Context completeness score
-- Estimated embedding cost
-- Vector database integration
-- Docker setup
-- Deployment guide
-- Screenshot/GIF section for GitHub
-
----
-
-## Portfolio Positioning
-
-Suggested GitHub description:
-
-```text
-A web-based simulator for comparing RAG chunking strategies including LangChain splitters, semantic chunking, metadata visualization, recursive vs semantic comparison, and strategy recommendation.
-```
-
-Suggested LinkedIn description:
-
-```text
-Built a RAG Chunking Strategy Simulator to understand how different document chunking techniques affect retrieval quality in Enterprise AI systems. The app supports LangChain splitters, semantic chunking, metadata visualization, strategy comparison, and exportable chunks.
-```
-
----
-
-## Learning Outcomes
-
-This project demonstrates:
-
-- Enterprise RAG architecture
-- Document preprocessing
-- LangChain text splitters
+- Multiple chunking strategies
 - Semantic chunking
-- Embedding-based similarity
-- FastAPI API design
-- Next.js frontend development
-- AI developer tool design
-- Chunk evaluation and comparison
-- Practical Enterprise AI engineering
+- File upload
+- Strategy comparison
+- Recursive vs Semantic comparison
+- Recommendation engine
+- Metadata visualization
+- Chunk quality metrics
+- Export JSON
+- LangChain code generation
+- Unit tests
+
+## 🚧 Planned
+
+- Retrieval Simulator
+- Embedding Visualization
+- Hybrid Chunking
+- LLM-based Chunking
+- Parent–Child Chunking
+- RAPTOR Chunking
+- Table-aware Chunking
+- OCR-aware Chunking
+- Multi-document Benchmarking
+- Docker
+- GitHub Actions CI/CD
+- Vector Database Integration
+- RAG Evaluation Dashboard
 
 ---
 
-## License
+# 🤝 Contributing
+
+Contributions, ideas, and feature requests are welcome.
+
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Open a Pull Request
+
+---
+
+# 📜 License
 
 MIT License
+
+---
+
+# 👨‍💻 Author
+
+**Jay Ram Singh**
+
+AI Engineer | Enterprise AI Architect | RAG & LLM Systems
+
+- GitHub: *Add your GitHub profile*
+- LinkedIn: *Add your LinkedIn profile*
+
+---
+
+⭐ **If you find this project useful, consider giving it a Star!**
