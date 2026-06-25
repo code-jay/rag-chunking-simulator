@@ -42,6 +42,8 @@ This simulator allows developers, AI engineers, and architects to:
 - Paragraph
 - Sentence
 
+### Adaptive Hybrid
+
 ### LangChain
 
 - Recursive Character Splitter
@@ -51,11 +53,23 @@ This simulator allows developers, AI engineers, and architects to:
 - Python Code Splitter
 - JavaScript Code Splitter
 
+### Overlapping Chunking
+
+### Hierarchical Chunking
+
+### Summary Attached Chunking
+
+### Metadata Enhanced 
+
+### Parent Child
+
 ### AI-powered
 
 - Semantic Similarity Chunking
   - Sentence Transformers
   - Configurable similarity threshold
+- LLM based chunking
+
 
 ---
 
@@ -204,6 +218,12 @@ Unit tests cover
 - Python Chunker
 - JavaScript Chunker
 - Semantic Chunker
+- Adaptive Chunker
+- Metadata Chunker
+- Parent Child Chunker
+- Summary Attached Chunker
+- LLM assisted Chunker
+
 
 Run all tests
 
@@ -389,11 +409,7 @@ http://localhost:3000
 
 - Retrieval Simulator
 - Embedding Visualization
-- Hybrid Chunking
-- LLM-based Chunking
-- Parent–Child Chunking
 - RAPTOR Chunking
-- Table-aware Chunking
 - OCR-aware Chunking
 - Multi-document Benchmarking
 - Docker
@@ -432,3 +448,4 @@ AI Engineer | Enterprise AI Architect | RAG & LLM Systems
 ---
 
 ⭐ **If you find this project useful, consider giving it a Star!**
+
