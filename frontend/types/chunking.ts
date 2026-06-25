@@ -23,6 +23,7 @@ export type ChunkResponse = {
     similarity_threshold?: number;
   };
   stats: ChunkStats;
+  evaluation?: ChunkEvaluation;
   chunks: ChunkItem[];
   file?: {
     filename: string;
@@ -52,4 +53,10 @@ export type StrategyRecommendation = {
   recommended_strategy: string;
   confidence: string;
   reason: string;
+};
+
+export type ChunkEvaluation = {
+  chunk_quality_score: number;
+  context_preservation_score: number;
+  metadata_score: number;
 };

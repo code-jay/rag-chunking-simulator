@@ -1,8 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import chunking, upload
-from app.api import chunking, upload, compare
+from app.api import chunking, upload, compare, metadata
 
 app = FastAPI(
     title="RAG Chunking Strategy Simulator",
@@ -20,7 +19,7 @@ app.add_middleware(
 app.include_router(chunking.router, tags=["Chunking"])
 app.include_router(upload.router, tags=["Upload"])
 app.include_router(compare.router, tags=["Compare"])
-
+app.include_router(metadata.router, tags=["Metadata"])
 
 @app.get("/")
 def home():

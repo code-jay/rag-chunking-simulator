@@ -10,7 +10,7 @@ import {
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-type TabType = "chunks" | "comparison" | "recursiveSemantic" | "developer";
+type TabType = "chunks" | "comparison" | "recursiveSemantic" | "developer" | "metadata";
 
 const STRATEGIES = [
   { id: "recursive", label: "LangChain Recursive", hint: "Best default for PDF, DOCX, TXT" },
@@ -80,11 +80,34 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState<TabType>("chunks");
   const [expandedChunks, setExpandedChunks] = useState<Record<number, boolean>>({});
   const [loading, setLoading] = useState(false);
+  const [metadataKey, setMetadataKey] = useState("type");
+  const [metadataValue, setMetadataValue] = useState("semantic");
+  const [filteredChunks, setFilteredChunks] = useState<ChunkResponse["chunks"] | null>(null);
   const [error, setError] = useState("");
 
   const wordCount = useMemo(() => {
     return text.trim() ? text.trim().split(/\s+/).length : 0;
   }, [text]);
+
+  async function applyMetadataFilter() {
+  if (!result) return;
+
+  const res = await fetch(`${API_URL}/metadata-filter`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      chunks: result.chunks,
+      filters: {
+        [metadataKey]: metadataValue,
+      },
+    }),
+  });
+
+  const data = await res.json();
+  setFilteredChunks(data.chunks);
+}
 
   async function runChunking() {
     setLoading(true);
@@ -381,10 +404,8 @@ model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
             )}
 
             <div className="space-y-3">
-              <ActionButton label={loading ? "Processing..." : "Run Chunking"} onClick={runChunking} disabled={loading || (!text.trim() && !file)} tone="blue" />
               <ActionButton label="Compare Strategies" onClick={compareStrategies} disabled={loading || !text.trim()} tone="purple" />
               <ActionButton label="Compare Recursive vs Semantic" onClick={compareRecursiveSemantic} disabled={loading || !text.trim()} tone="indigo" />
-              <ActionButton label="Recommend Best Strategy" onClick={getRecommendation} disabled={loading || !text.trim()} tone="amber" />
             </div>
 
             <div className="mt-6 rounded-xl border border-gray-800 bg-gray-950/70 p-4">
@@ -436,6 +457,27 @@ model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
                 value={text}
                 onChange={(e) => setText(e.target.value)}
               />
+              <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+                <button
+                  onClick={runChunking}
+                  disabled={loading || (!text.trim() && !file)}
+                  className="flex-1 rounded-lg bg-blue-600 px-4 py-3 font-semibold hover:bg-blue-700 disabled:bg-gray-700"
+                >
+                  {loading ? "Processing..." : "🚀 Run Chunking"}
+                </button>
+
+                <button
+                  onClick={getRecommendation}
+                  disabled={loading || !text.trim()}
+                  className="flex-1 rounded-lg bg-amber-600 px-4 py-3 font-semibold hover:bg-amber-700 disabled:bg-gray-700"
+                >
+                  ⭐ Recommend Best Strategy
+                </button>
+                
+              </div>
+              <div className="mt-4 w-full ">
+              {recommendation && <RecommendationCard recommendation={recommendation} onUse={() => setStrategy(recommendation.recommended_strategy)} />}
+              </div>
 
               <div className="mt-4 flex flex-wrap gap-2">
                 <SampleButton label="Sample: Mixed Topics" onClick={() => loadSample("mixed")} />
@@ -447,7 +489,6 @@ model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
 
             {error && <section className="rounded-xl border border-red-800 bg-red-950 p-4 text-red-200">{error}</section>}
 
-            {recommendation && <RecommendationCard recommendation={recommendation} onUse={() => setStrategy(recommendation.recommended_strategy)} />}
 
             <section className="grid grid-cols-2 gap-4 md:grid-cols-5">
               <Stat title="Total Chunks" value={result?.stats.total_chunks ?? 0} />
@@ -456,13 +497,34 @@ model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
               <Stat title="Max Chars" value={result?.stats.max_characters ?? 0} />
               <Stat title="Avg Words" value={result?.stats.avg_words ?? 0} />
             </section>
+              {result?.evaluation && (
+                <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <ScoreCard
+                    title="Chunk Quality Score"
+                    value={result.evaluation.chunk_quality_score}
+                    description="Checks chunk size, completeness, and boundary quality."
+                  />
 
+                  <ScoreCard
+                    title="Context Preservation Score"
+                    value={result.evaluation.context_preservation_score}
+                    description="Checks whether chunks start and end naturally."
+                  />
+
+                  <ScoreCard
+                    title="Metadata Score"
+                    value={result.evaluation.metadata_score}
+                    description="Shows how many chunks contain useful metadata."
+                  />
+                </section>
+              )}
             <section className="overflow-hidden rounded-2xl border border-gray-800 bg-gray-900">
               <div className="flex flex-wrap border-b border-gray-800">
                 <TabButton label="📄 Chunks" tab="chunks" activeTab={activeTab} setActiveTab={setActiveTab} />
                 <TabButton label="📊 Strategy Comparison" tab="comparison" activeTab={activeTab} setActiveTab={setActiveTab} />
                 <TabButton label="⚖ Recursive vs Semantic" tab="recursiveSemantic" activeTab={activeTab} setActiveTab={setActiveTab} />
                 <TabButton label="💻 Developer Tools" tab="developer" activeTab={activeTab} setActiveTab={setActiveTab} />
+                <TabButton label="🏷 Metadata Filter" tab="metadata" activeTab={activeTab} setActiveTab={setActiveTab}/>
               </div>
 
               <div className="p-5">
@@ -498,6 +560,17 @@ model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
                 {activeTab === "developer" && (
                   <DeveloperPanel hasResult={!!result} onExport={exportJson} onCopyChunks={copyChunks} onCopyCode={copyLangChainCode} />
                 )}
+
+                {activeTab === "metadata" && (
+                    <MetadataFilterPanel
+                      metadataKey={metadataKey}
+                      metadataValue={metadataValue}
+                      setMetadataKey={setMetadataKey}
+                      setMetadataValue={setMetadataValue}
+                      onApply={applyMetadataFilter}
+                      filteredChunks={filteredChunks}
+                    />
+                  )}
               </div>
             </section>
           </section>
@@ -577,4 +650,96 @@ function DeveloperPanel({ hasResult, onExport, onCopyChunks, onCopyCode }: { has
 
 function EmptyState({ title, description }: { title: string; description: string }) {
   return <div className="flex min-h-[320px] flex-col items-center justify-center rounded-xl border border-gray-800 bg-gray-950/60 p-8 text-center"><div className="mb-4 text-5xl">📄</div><h3 className="text-xl font-bold">{title}</h3><p className="mt-2 text-gray-400">{description}</p></div>;
+}
+
+function MetadataFilterPanel({
+  metadataKey,
+  metadataValue,
+  setMetadataKey,
+  setMetadataValue,
+  onApply,
+  filteredChunks,
+}: {
+  metadataKey: string;
+  metadataValue: string;
+  setMetadataKey: React.Dispatch<React.SetStateAction<string>>;
+  setMetadataValue: React.Dispatch<React.SetStateAction<string>>;
+  onApply: () => void;
+  filteredChunks: ChunkItem[] | null;
+}) {
+  return (
+    <section className="space-y-6">
+      <h2 className="text-2xl font-bold">
+        Metadata Filtering Simulation
+      </h2>
+
+      <div className="grid md:grid-cols-3 gap-4">
+        <input
+          className="p-3 rounded bg-gray-800 border border-gray-700"
+          placeholder="Metadata Key"
+          value={metadataKey}
+          onChange={(e) => setMetadataKey(e.target.value)}
+        />
+
+        <input
+          className="p-3 rounded bg-gray-800 border border-gray-700"
+          placeholder="Metadata Value"
+          value={metadataValue}
+          onChange={(e) => setMetadataValue(e.target.value)}
+        />
+
+        <button
+          onClick={onApply}
+          className="bg-blue-600 rounded p-3 font-semibold"
+        >
+          Apply Filter
+        </button>
+      </div>
+
+      {filteredChunks && (
+        <>
+          <p className="text-gray-400">
+            Matching Chunks: {filteredChunks.length}
+          </p>
+
+          <div className="space-y-4">
+            {filteredChunks.map((chunk) => (
+              <CollapsibleChunkCard
+                key={chunk.chunk_id}
+                chunk={chunk}
+                expanded={true}
+                onToggle={() => {}}
+              />
+            ))}
+          </div>
+        </>
+      )}
+    </section>
+  );
+}
+
+function ScoreCard({
+  title,
+  value,
+  description,
+}: {
+  title: string;
+  value: number;
+  description: string;
+}) {
+  return (
+    <div className="rounded-2xl border border-gray-800 bg-gray-900 p-4">
+      <p className="text-sm text-gray-400">{title}</p>
+      <p className="mt-2 text-3xl font-bold">{value}%</p>
+
+      <div className="mt-3 h-2 w-full rounded-full bg-gray-700">
+        <div
+          className="h-2 rounded-full bg-green-500"
+          style={{ width: `${value}%` }}
+        />
+      </div>
+
+      <p className="mt-3 text-xs text-gray-500">{description}</p>
+    </div>
+  );
 }

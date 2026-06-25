@@ -15,8 +15,12 @@ from app.chunkers.code_chunker import python_code_chunk, javascript_code_chunk
 
 from app.services.stats_service import build_chunk_objects, calculate_stats
 
-from app.services.validation_service import validate_chunk_request
 from app.chunkers.semantic_chunker import semantic_similarity_chunk
+from app.services.validation_service import validate_chunk_request
+
+from app.services.evaluation_service import evaluate_chunks
+
+
 
 SUPPORTED_STRATEGIES = [
     {"id": "fixed_character", "name": "Fixed Character Chunking", "category": "basic"},
@@ -89,14 +93,16 @@ def chunk_text(text: str, strategy: str, chunk_size: int, chunk_overlap: int, si
 
     chunk_objects = build_chunk_objects(raw_chunks)
     stats = calculate_stats(chunk_objects)
+    evaluation = evaluate_chunks(chunk_objects)
 
     return {
-        "strategy": strategy,
-        "settings": {
-            "chunk_size": chunk_size,
-            "chunk_overlap": chunk_overlap,
-            "similarity_threshold": similarity_threshold
-        },
-        "stats": stats,
-        "chunks": chunk_objects
-    }
+    "strategy": strategy,
+    "settings": {
+        "chunk_size": chunk_size,
+        "chunk_overlap": chunk_overlap,
+        "similarity_threshold": similarity_threshold
+    },
+    "stats": stats,
+    "evaluation": evaluation,
+    "chunks": chunk_objects
+}
