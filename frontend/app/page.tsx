@@ -18,6 +18,7 @@ const STRATEGIES = [
   { id: "recursive", label: "LangChain Recursive", hint: "Best default for PDF, DOCX, TXT" },
   { id: "semantic_similarity", label: "Semantic Similarity", hint: "Best for topic-shift splitting" },
   { id: "parent_child", label: "Parent-Child", hint: "Hierarchical chunks: child retrieval with parent context"},
+  { id: "summary_attached", label: "Summary Attached", hint: "Adds short summary and keywords to each chunk"},
   { id: "fixed_character", label: "Fixed Character", hint: "Character-size baseline" },
   { id: "fixed_word", label: "Fixed Word", hint: "Word-size baseline" },
   { id: "fixed_token", label: "Fixed Token", hint: "Token-size baseline" },
@@ -28,7 +29,7 @@ const STRATEGIES = [
   { id: "html_header", label: "HTML Header", hint: "For HTML heading tags" },
   { id: "json_recursive", label: "Recursive JSON", hint: "For valid JSON only" },
   { id: "python_code", label: "Python Code", hint: "For Python source" },
-  { id: "javascript_code", label: "JavaScript Code", hint: "For JS/TS source" }
+  { id: "javascript_code", label: "JavaScript Code", hint: "For JS/TS source" },
 ];
 
 const SAMPLES: Record<string, string> = {
@@ -684,6 +685,27 @@ function MetadataBadges({ metadata }: { metadata?: Record<string, unknown> }) {
           <p className="mt-2 text-xs text-gray-400">
             Retrieval Use: {String(metadata.retrieval_use)}
           </p>
+        )}
+        {metadata.summary && (
+          <div className="mt-3 rounded-lg border border-gray-700 bg-gray-900 p-3">
+            <p className="text-xs font-semibold text-gray-300">Summary</p>
+            <p className="mt-1 text-sm text-gray-400">
+              {String(metadata.summary)}
+            </p>
+          </div>
+        )}
+
+        {Array.isArray(metadata.keywords) && metadata.keywords.length > 0 && (
+          <div className="mt-3 flex flex-wrap gap-2">
+            {metadata.keywords.map((keyword, index) => (
+              <span
+                key={`${String(keyword)}-${index}`}
+                className="rounded-full bg-gray-700 px-2 py-1 text-xs text-gray-200"
+              >
+                #{String(keyword)}
+              </span>
+            ))}
+          </div>
         )}
       </div>
       {similarity !== null && <><div className="mb-1 text-xs text-gray-300">Similarity Score: {similarity.toFixed(3)}</div><div className="h-2 w-full rounded-full bg-gray-700"><div className="h-2 rounded-full bg-green-500" style={{ width: `${similarity * 100}%` }} /></div></>}

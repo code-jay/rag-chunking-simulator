@@ -49,6 +49,7 @@ class CompareRequest(BaseModel):
         "metadata_enhanced",
         "parent_child",
         "adaptive_hybrid",
+        "summary_attached"
     ]
     chunk_size: int = 800
     chunk_overlap: int = 120
